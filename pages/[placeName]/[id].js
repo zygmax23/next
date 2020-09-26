@@ -1,17 +1,22 @@
 import React from "react";
 
-const MainPage = ({ menuList, placeName, id }) => {
+const MainPage = ({ menuList, placeName, id, slowData }) => {
   return (
     <>
       <h1>
         Witamy w {placeName} przy stoliku numer {id}
       </h1>
+      <p>Slow data: {slowData}</p>
       {menuList.map((item, idx) => (
         <p key={idx}>{item.node.name}</p>
       ))}
     </>
   );
 };
+
+function timeout(ms) {
+  return new Promise((resolve, reject) => setTimeout(() => resolve(1), ms));
+}
 
 export async function getServerSideProps(ctx) {
   const res = await fetch("https://jammyorder-9b978.firebaseio.com/Meals.json", {
@@ -28,15 +33,14 @@ export async function getServerSideProps(ctx) {
     },
   }));
 
-  setTimeout(() => {
-    console.log("no i trzeba czekac");
-  }, 5000);
+  const simulateTimeout = await timeout(5000);
 
   return {
     props: {
       menuList,
       placeName: ctx.query.placeName,
       id: ctx.query.id,
+      slowData: simulateTimeout,
     },
   };
 }
